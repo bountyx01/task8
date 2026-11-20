@@ -6,13 +6,25 @@
 
 Располагаются в `polygon/` (`task3` и `task7`). Являются копиями ранних репозиториев, однако (для наличия замечаний) туда добавлен файл `feat_merge_please.py`, в котором есть несколько не хороших функциональностей, которые целевые инструменты должны были найти.
 
-Веб-сервис поднимется на 8077 по умолчанию
-
-Остановка
+Запустить сканирования можно как:
+```bash
+./scripts/scan.sh polygon/task3 reports/task3
+./scripts/scan.sh polygon/task7 reports/task7
 ```
-docker compose down -v
+
+Далее необходимо создать triage.json с результатами ручной валидации результатов.
+
+Для удобства - команда, чтобы скопировать "скелет" scan.json в triage.json:
+```bash
+for task8_app in task3 task7; do
+  jq '[.findings[] | {ids: [.id], type: .rule, reason: "", priority: ""}]' \
+    "reports/$task8_app/scan.json" > "reports/$task8_app/triage.json"
+done
 ```
 
-## Пояснение к .env, секретам
-В репозитории указаны демонстрационные пароли/секреты
-Перед использованием нужно сгенерировать .env с помощью tools/gen-env.sh
+Затем необходимо собрать отчет
+```bash
+python3 -I scripts/make_report.py reports/task3 reports/task7 -o reports/report.md
+```
+
+Отчет доступен в `reports/report.md`
