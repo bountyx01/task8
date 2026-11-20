@@ -1,0 +1,34 @@
+services:
+  workbench:
+    build: ./workbench
+    image: standoff-workbench:1.0
+    env_file: ./workbench/workbench.env
+    stdin_open: true
+    tty: true
+    init: true
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - bench_logs:/var/log/workbench
+
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JUDGE_USER: ${JUDGE_USER}
+      JUDGE_PASSWORD: ${JUDGE_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:
+  bench_logs:

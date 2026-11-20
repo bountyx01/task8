@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %} | Stand.Off</title>
+  <style>
+    body { max-width: 70rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+    nav { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    label { display: block; margin: .6rem 0; }
+    input, select, textarea, button { font: inherit; }
+    textarea { vertical-align: top; }
+    .scroll { overflow-x: auto; }
+    table { border-collapse: collapse; }
+    th, td { border: 1px solid #bbb; padding: .3rem .6rem; text-align: left; }
+    [role=alert] { color: #992323; }
+  </style>
+</head>
+<body>
+  {% if g.account %}
+    <nav>
+      <a href="{{ url_for('home') }}">Главная</a>
+      <span>{{ g.account[0] }}</span>
+      <form method="post" action="{{ url_for('logout') }}">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <button>Выйти</button>
+      </form>
+    </nav>
+  {% endif %}
+  <h1>{{ self.title() }}</h1>
+  {% for message in get_flashed_messages() %}<p role="status">{{ message }}</p>{% endfor %}
+  {% if error %}<p role="alert">{{ error }}</p>{% endif %}
+  {% if name %}
+    <p>Таблица:
+      {% for table in available|default(tables) %}
+        {% if table == name %}<strong>{{ table }}</strong>{% else %}<a href="{{ url_for(request.endpoint, table=table, mode=request.args.get('mode')) }}">{{ table }}</a>{% endif %}
+      {% endfor %}
+    </p>
+  {% endif %}
+  {% block content %}{% endblock %}
+</body>
+</html>

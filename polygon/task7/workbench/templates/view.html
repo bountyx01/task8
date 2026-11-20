@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Таблица с фильтрами' if filtered else 'Просмотр таблицы' }}{% endblock %}
+{% block content %}
+  {% if filtered %}
+    <form method="get">
+      <input type="hidden" name="table" value="{{ name }}">
+      <input type="hidden" name="mode" value="filter">
+      <p>Условия соединяются через И. Заполните условие и нажмите «Еще условие» или «Показать».</p>
+      {% for field, op, raw in filters + [('', 'eq', '')] %}
+        <div>
+          <select name="field" aria-label="Колонка {{ loop.index }}">
+            <option value="">Без условия</option>
+            {% for item in tables[name] %}<option {% if field == item %}selected{% endif %}>{{ item }}</option>{% endfor %}
+          </select>
+          <select name="op" aria-label="Условие {{ loop.index }}">
+            <option value="eq">=</option><option value="null" {% if op == 'null' %}selected{% endif %}>IS NULL</option>
+          </select>
+          <input name="value" value="{{ raw }}" aria-label="Значение {{ loop.index }}">
+        </div>
+      {% endfor %}
+      <button>Показать</button>
+      <button name="more" value="1">Еще условие</button>
+      <a href="{{ url_for('view', table=name, mode='filter') }}">Сбросить фильтры</a>
+    </form>
+  {% else %}
+    <p><a href="{{ url_for('view', table=name, mode='filter') }}">Задать фильтры</a></p>
+  {% endif %}
+  {% if rows is defined and not error %}
+    <p>Строк: {{ rows|length }}</p>
+    <div class="scroll">
+      <table>
+        <thead><tr>{% for field in fields %}<th>{{ field }}</th>{% endfor %}</tr></thead>
+        <tbody>
+          {% for row in rows %}
+            <tr>{% for cell in row %}<td>{{ 'NULL' if cell is none else cell }}</td>{% endfor %}</tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 17 files tracked by git with 110 Code rules:
+                                                                                                                        
+  Language     Rules   Files          Origin   Rules                                                                    
+ ────────────────────────────        ────────────────                                                                   
+  python          94       4          Custom     110                                                                    
+  bash             3       4                                                                                            
+  yaml             7       2                                                                                            
+  dockerfile       7       1                                                                                            
+                                                                                                                        
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 110
+ • Targets scanned: 11
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 110 rules on 11 files: 0 findings.

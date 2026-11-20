@@ -1,0 +1,13 @@
+{% macro value_input(table, field, key) %}
+  {% set raw = request.form.get(key, '') %}
+  {% if field in options %}
+    <select name="{{ key }}">
+      <option value="">NULL</option>
+      {% for value in options[field] %}<option {% if raw == value %}selected{% endif %}>{{ value }}</option>{% endfor %}
+    </select>
+  {% else %}
+    {% set kind = tables[table][field] %}
+    <input name="{{ key }}" type="{{ 'number' if kind == 'int' else 'text' }}" value="{{ raw }}"
+           {% if kind == 'timestamp' %}placeholder="2026-10-08 14:30+03:00"{% endif %}>
+  {% endif %}
+{% endmacro %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "fields.html" import value_input with context %}
+{% block title %}{{ 'Изменить запись по id' if mode == 'one' else 'Изменить несколько записей' }}{% endblock %}
+{% block content %}
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}">
+    {% if mode == 'one' %}
+      <label>id записи <input type="number" name="id" value="{{ request.form.get('id', '') }}" required></label>
+      <p>Отметьте колонки для изменения. Пустое значение отмеченной колонки означает NULL.</p>
+      {% for field in tables[name] if field != 'id' %}
+        <div>
+          <label><input type="checkbox" name="field" value="{{ field }}" {% if field in request.form.getlist('field') %}checked{% endif %}> {{ field }}</label>
+          <label>Новое значение {{ field }} {{ value_input(name, field, 'set.' ~ field) }}</label>
+        </div>
+      {% endfor %}
+    {% else %}
+      <label>Что изменить
+        <select name="field">
+          {% for field, kind in tables[name].items() if field != 'id' %}
+            <option value="{{ field }}" {% if field == request.form.get('field') %}selected{% endif %}>{{ field }} ({{ options[field]|join(', ') if field in options else hints[kind] }})</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Новое значение <input name="value" value="{{ request.form.get('value', '') }}" placeholder="пусто = NULL"></label>
+      <label>Отобрать строки по колонке
+        <select name="by_field">
+          {% for field in tables[name] %}<option {% if field == request.form.get('by_field') %}selected{% endif %}>{{ field }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Разделитель значений
+        <select name="separator">
+          <option value="lines">Перенос строки</option>
+          <option value="comma" {% if request.form.get('separator') == 'comma' %}selected{% endif %}>Запятая</option>
+        </select>
+      </label>
+      <label>Значения для отбора<br><textarea name="values" rows="4" required>{{ request.form.get('values', '') }}</textarea></label>
+    {% endif %}
+    <button>Обновить</button>
+  </form>
+{% endblock %}

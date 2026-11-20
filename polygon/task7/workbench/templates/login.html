@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Вход в БД{% endblock %}
+{% block content %}
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}">
+    <label>Логин <input name="login" value="{{ request.form.get('login', '') }}" autocomplete="username" required autofocus></label>
+    <label>Пароль <input type="password" name="password" autocomplete="current-password" required></label>
+    <button>Войти</button>
+  </form>
+{% endblock %}

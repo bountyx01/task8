@@ -1,0 +1,94 @@
+{
+  "source": "/Users/pwn/sdl/sdlc-tasks/task8/polygon/task7",
+  "commit": null,
+  "tools": {
+    "semgrep": {
+      "image": "sha256:ab3fbeb694b56827907d26390a50fd7f0156dbaee78b5d13ee562dd309aafad9",
+      "version": "1.186.0",
+      "rules": "a5ad1714f00c9f7fde980cab0ea1d6dc6d414fd2",
+      "rules_sha256": "e5a7ec33035fc7707b87385cb99e1228c76b1604efe5439e92891f3005714cc3",
+      "raw_sha256": "681880aa3902ecf1d2cdddc3c1616241bb6c4877ba5526e2f667a8838600fea0",
+      "scanned": [
+        "compose.yaml",
+        "postgres/30-judge.sh",
+        "tools/deploy.sh",
+        "tools/gen-env.sh",
+        "workbench/Dockerfile",
+        "workbench/config.yaml",
+        "workbench/feat_merge_please.py",
+        "workbench/messages.py",
+        "workbench/storage.py",
+        "workbench/workbench.py"
+      ],
+      "outside_scan": [
+        ".env.example",
+        ".gitignore",
+        "postgres/10-schema.sql",
+        "postgres/20-seed.sql",
+        "workbench/requirements.txt",
+        "workbench/templates/add.html",
+        "workbench/templates/base.html",
+        "workbench/templates/fields.html",
+        "workbench/templates/home.html",
+        "workbench/templates/login.html",
+        "workbench/templates/update.html",
+        "workbench/templates/view.html"
+      ]
+    },
+    "bandit": {
+      "image": "sha256:34d92bfe16e1b127449015f31023fbe0c209ec3893b4d415d8a1fbe12c4cb9f2",
+      "version": "1.9.4",
+      "rules": "built-in",
+      "rules_sha256": null,
+      "raw_sha256": "50893d2ee204e53439b115951ba41bdc65f3511e2b41b144f9a48e4f3caa40e3",
+      "scanned": [
+        "workbench/feat_merge_please.py",
+        "workbench/messages.py",
+        "workbench/storage.py",
+        "workbench/workbench.py"
+      ],
+      "outside_scan": [
+        ".env.example",
+        ".gitignore",
+        "compose.yaml",
+        "postgres/10-schema.sql",
+        "postgres/20-seed.sql",
+        "postgres/30-judge.sh",
+        "tools/deploy.sh",
+        "tools/gen-env.sh",
+        "workbench/Dockerfile",
+        "workbench/config.yaml",
+        "workbench/requirements.txt",
+        "workbench/templates/add.html",
+        "workbench/templates/base.html",
+        "workbench/templates/fields.html",
+        "workbench/templates/home.html",
+        "workbench/templates/login.html",
+        "workbench/templates/update.html",
+        "workbench/templates/view.html"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "bandit:1",
+      "tool": "bandit",
+      "file": "workbench/feat_merge_please.py",
+      "line": 1,
+      "rule": "B105",
+      "details": "Possible hardcoded password: 'supersecretpasswordformeonly'",
+      "severity": "LOW",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "bandit:2",
+      "tool": "bandit",
+      "file": "workbench/feat_merge_please.py",
+      "line": 5,
+      "rule": "B608",
+      "details": "Possible SQL injection vector through string-based query construction.",
+      "severity": "MEDIUM",
+      "confidence": "LOW"
+    }
+  ]
+}

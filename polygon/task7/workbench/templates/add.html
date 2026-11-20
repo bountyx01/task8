@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "fields.html" import value_input with context %}
+{% block title %}{{ {'one': 'Добавить запись', 'tree': 'Добавить запись с дочерними', 'many': 'Добавить несколько записей', 'trees': 'Добавить несколько записей с дочерними'}[mode] }}{% endblock %}
+
+{% macro choose_fields(table, key, selected, skip='') %}
+  <fieldset>
+    <legend>Колонки {{ table }}</legend>
+    {% for field in tables[table] if field != 'id' and field != skip %}
+      {% if field in required[table] %}
+        <label><input type="checkbox" checked disabled> {{ field }} *</label>
+        <input type="hidden" name="{{ key }}" value="{{ field }}">
+      {% else %}
+        <label><input type="checkbox" name="{{ key }}" value="{{ field }}" {% if field in selected %}checked{% endif %}> {{ field }}</label>
+      {% endif %}
+    {% endfor %}
+  </fieldset>
+{% endmacro %}
+
+{% macro row_inputs(table, selected, prefix) %}
+  {% for field in selected %}
+    <label>{{ field }} {{ value_input(table, field, prefix ~ '.' ~ field) }}</label>
+  {% endfor %}
+{% endmacro %}
+
+{% block content %}
+  {% if outcome %}
+    <p role="status">{{ outcome }}</p>
+    <a href="{{ url_for('view', table=saved_table) }}">Показать таблицу {{ saved_table }}</a> ·
+    <a href="{{ url_for('add', mode=mode, table=saved_table) }}">Добавить еще</a>
+  {% else %}
+    <form method="post">
+      <input type="hidden" name="csrf" value="{{ session.csrf }}">
+      {% if step == 'setup' %}
+        <p>Обязательные колонки отмечены *. Для невыбранных колонок БД использует значение по умолчанию.</p>
+        {{ choose_fields(name, 'field', fields) }}
+        {% if mode in ('many', 'trees') %}
+          <label>Количество записей {{ name }} <input type="number" name="count" value="{{ count }}" min="1" max="50" required></label>
+        {% endif %}
+        <button name="action" value="prepare">Далее</button>
+      {% else %}
+        {% for field in fields %}<input type="hidden" name="field" value="{{ field }}">{% endfor %}
+        <input type="hidden" name="count" value="{{ count }}">
+        {% if step == 'counts' %}
+          {% for i in range(count) %}
+            <label>{{ name }} {{ i + 1 }}: количество дочерних строк {{ child }}
+              <input type="number" name="children" value="{{ counts[i] }}" min="0" max="50" required>
+            </label>
+          {% endfor %}
+          <button name="action" value="children">Далее</button>
+        {% else %}
+          {% for n in counts %}<input type="hidden" name="children" value="{{ n }}">{% endfor %}
+          {% if step == 'columns' %}
+            <p>{{ child }}.{{ link }} будет заполнен новым id родителя.</p>
+            {{ choose_fields(child, 'child_field', child_fields, link) }}
+            <button name="action" value="rows">Далее</button>
+          {% else %}
+            {% for field in child_fields %}<input type="hidden" name="child_field" value="{{ field }}">{% endfor %}
+            <p>Пустое значение выбранной колонки означает NULL.</p>
+            {% for i in range(count) %}
+              <fieldset>
+                <legend>{{ name }}: запись {{ i + 1 }}</legend>
+                {{ row_inputs(name, fields, 'p.' ~ i) }}
+                {% for j in range(counts[i] if child else 0) %}
+                  <fieldset><legend>{{ child }}: запись {{ j + 1 }}</legend>
+                    {{ row_inputs(child, child_fields, 'c.' ~ i ~ '.' ~ j) }}
+                  </fieldset>
+                {% endfor %}
+              </fieldset>
+            {% endfor %}
+            <button name="action" value="save">Добавить</button>
+          {% endif %}
+        {% endif %}
+        <a href="{{ url_for('add', mode=mode, table=name) }}">Выбрать колонки заново</a>
+      {% endif %}
+    </form>
+  {% endif %}
+{% endblock %}
